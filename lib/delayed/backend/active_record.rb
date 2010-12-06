@@ -1,6 +1,22 @@
 require 'active_record'
 
 class ActiveRecord::Base
+  yaml_as "tag:ruby.yaml.org,2002:ActiveRecord"
+
+  def self.yaml_new(klass, tag, val)
+    klass.find(val['attributes']['id'])
+  rescue ActiveRecord::RecordNotFound
+    if defined? Delayed::Backend::DeserializationError
+      raise Delayed::Backend::DeserializationError
+    else
+      raise
+    end
+  end
+
+  def to_yaml_properties
+    ['@attributes']
+  end
+
   def self.load_for_delayed_job(id)
     if id
       find(id)
