@@ -99,6 +99,7 @@ module Delayed
 			logfile = File.join(Rails.root, 'log', 'delayed_job.log')
 			logfile.sync = true
       Delayed::Worker.logger = Logger.new(logfile)
+      Delayed::Worker.logger.level = Logger::DEBUG
       Delayed::Worker.backend.after_fork
       
       worker = Delayed::Worker.new(@options)
