@@ -96,7 +96,9 @@ module Delayed
         end
       end
       
-      Delayed::Worker.logger = Logger.new(File.join(Rails.root, 'log', 'delayed_job.log'))
+			logfile = File.join(Rails.root, 'log', 'delayed_job.log')
+			logfile.sync = true
+      Delayed::Worker.logger = Logger.new(logfile)
       Delayed::Worker.backend.after_fork
       
       worker = Delayed::Worker.new(@options)
