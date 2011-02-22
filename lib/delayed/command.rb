@@ -54,7 +54,7 @@ module Delayed
       @args = opts.parse!(args)
     end
   
-    def daemonize
+    def daemonize(ontop = false)
       Delayed::Worker.backend.before_fork
 
       ObjectSpace.each_object(File) do |file|
@@ -68,17 +68,17 @@ module Delayed
         raise ArgumentError, 'Cannot specify both --number-of-workers and --identifier'
       elsif @worker_count == 1 && @options[:identifier]
         process_name = "delayed_job.#{@options[:identifier]}"
-        run_process(process_name, dir)
+        run_process(process_name, dir, ontop)
       else
         worker_count.times do |worker_index|
           process_name = worker_count == 1 ? "delayed_job" : "delayed_job.#{worker_index}"
-          run_process(process_name, dir)
+          run_process(process_name, dir, ontop)
         end
       end
     end
     
-    def run_process(process_name, dir)
-      Daemons.run_proc(process_name, :dir => dir, :dir_mode => :normal, :monitor => @monitor, :ARGV => @args) do |*args|
+    def run_process(process_name, dir, ontop = false)
+      Daemons.run_proc(process_name, :dir => dir, :dir_mode => :normal, :ontop => ontop, :monitor => @monitor, :ARGV => @args) do |*args|
         $0 = File.join(@options[:prefix], process_name) if @options[:prefix]
         run process_name
       end

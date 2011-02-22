@@ -66,6 +66,7 @@ module Delayed
     end
 
     def start
+			debugger
       say "Starting job worker"
 
       trap('TERM') { say 'Exiting...'; $exit = true }
