@@ -116,20 +116,20 @@ module Delayed
     end
 
     def run(job)
+			say "#{job.id}: order: #{job.payload_object.id}"
+			say "#{job.id}: before invoke"
       runtime =  Benchmark.realtime do
-				say "#{job.name}: Calling invoke_job"
         Timeout.timeout(self.class.max_run_time.to_i) { job.invoke_job }
-				say "#{job.name}: After invoke_job"
         job.destroy
       end
-      say "#{job.name} completed after %.4f" % runtime
+      say "#{job.id} completed after %.4f" % runtime
       return true  # did work
     rescue DeserializationError => error
-			say "#{job.name}: DeserializationError"
+			say "#{job.id}: DeserializationError"
       job.last_error = "{#{error.message}\n#{error.backtrace.join('\n')}"
       failed(job)
     rescue Exception => error
-			say "#{job.name}: Exception"
+			say "#{job.id}: Exception"
       handle_failed_job(job, error)
       return false  # work failed
     end
